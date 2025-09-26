@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab4: JS AJAX CRUD 실습</title>
+</head>
+
+
+<body>
+    <h1>젤리 리스트</h1>
+
+    
+
+    <div id="buttonGroup">
+        <button id="btnRead">조회 (Read: GET)</button>
+
+        <ul id="userList"> </ul>
+
+        <div id="inputForm">
+        <input type="text" id="inputName" placeholder="이름 (Name)" required>
+        <input type="number" id="inputPrice" placeholder="가격 (Price)" required>
+        <input type="text" id="inputCountry" placeholder="국가 (Country)">
+        <input type="number" id="inputQuantity" placeholder="수량 (Quantity)" required>
+        <input type="text" id="inputTargetId" placeholder="수정 시 ID 입력" title="수정 기능을 사용할 때만 여기에 ID를 입력하세요.">
+    </div>
+
+        <button id="btnCreate">추가 (Create: POST)</button>
+        <button id="btnUpdate">수정 (Update: PUT)</button>
+        <button id="btnDelete">삭제 (Delete: 이름으로)</button>
+    </div>
+
+
+    <script>
+        const API_URL = "http://localhost:3001/jelly";
+
+        const getInputValues = () => ({
+            name: document.getElementById('inputName').value.trim(),
+            price: parseFloat(document.getElementById('inputPrice').value),
+            country: document.getElementById('inputCountry').value.trim(),
+            quantity: parseInt(document.getElementById('inputQuantity').value, 10),
+            targetId: document.getElementById('inputTargetId').value.trim() // 수정 시 ID
+        });
+
+        const clearInputs = () => {
+            document.getElementById('inputName').value = '';
+            document.getElementById('inputPrice').value = '';
+            document.getElementById('inputCountry').value = '';
+            document.getElementById('inputQuantity').value = '';
+            document.getElementById('inputTargetId').value = '';
+        };
+
+        const updateUI = (data) => {
+            const userList = document.getElementById("userList");
+            userList.innerHTML = Array.isArray(data) && data.length > 0
+                ? data.map(candy =>
+                    `<li class="user-item">
+                        <span class="item-details">
+                            <strong>${candy.name}</strong> (${candy.country}) | $${candy.price.toFixed(2)} | 재고: ${candy.quantity}개
+                        </span>
+                        <span class="item-id">ID: ${candy.id}</span>
+                    </li>`
+                ).join('')
+                : '<li>표시할 데이터가 없습니다. (서버 연결을 확인하세요)</li>';
+        };
+
+        const handleFetch = async (url, options = {}) => {
+            try {
+                const response = await fetch(url, options);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP 오류: ${response.status} - ${response.statusText}`);
+                }
+
+                return response.status !== 204 ? await response.json() : null;
+            } catch (error) {
+                console.error("AJAX 요청 실패:", error);
+                throw error;
+            }
+        };
+
+        // Read (조회) - GET
+        const readData = async () => {
+            try {
+                const data = await handleFetch(API_URL);
+                updateUI(data);
+                return data;
+            } catch (error) {
+                alert("데이터 조회에 실패했습니다. 서버(json-server) 실행 여부와 콘솔을 확인하세요.");
+                return null;
+            }
+        };
+
+        // Create (추가) - POST
+        const createData = async () => {
+            const { name, price, country, quantity } = getInputValues();
+
+            if (!name || isNaN(price) || isNaN(quantity)) {
+                alert("이름, 가격, 수량을 올바르게 입력해주세요.");
+                return;
+            }
+
+            const newCandyData = { name, price, country, quantity };
+
+            try {
+                const options = {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(newCandyData)
+                };
+                const result = await handleFetch(API_URL, options);
+                alert(`데이터 추가 완료: ${result.name} (ID: ${result.id})`);
+                clearInputs();
+                await readData();
+            } catch (error) {
+                alert("데이터 추가에 실패했습니다. 콘솔을 확인하세요.");
+            }
+        };
+
+        // Update (수정) - PUT ID와 수정 내용을 모두 입력 필드에서 읽어옴
+        const updateData = async () => {
+            const { name, price, country, quantity, targetId } = getInputValues();
+
+            if (!targetId) {
+                alert("수정할 대상의 ID를 '수정 시 ID 입력' 필드에 반드시 입력해주세요.");
+                return;
+            }
+            if (!name || isNaN(price) || isNaN(quantity)) {
+                alert("수정할 이름, 가격, 수량을 올바르게 입력해주세요.");
+                return;
+            }
+
+            try {
+                const updateUrl = `${API_URL}/${targetId}`;
+                // PUT 요청 본문에 ID를 포함해야 json-server가 올바르게 작동함
+                const updatedPayload = { name, price, country, quantity, id: targetId };
+
+                const options = {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(updatedPayload)
+                };
+                await handleFetch(updateUrl, options);
+                alert(`ID ${targetId} 데이터 수정 완료.`);
+                clearInputs();
+                await readData();
+            } catch (error) {
+                alert("데이터 수정에 실패했습니다. (ID 오류 또는 서버 오류). 콘솔을 확인하세요.");
+            }
+        };
+
+        // Delete (삭제)
+        const deleteData = async () => {
+            const candyName = prompt("삭제할 젤리의 정확한 이름을 입력하세요.");
+            if (!candyName) return;
+
+            try {
+                const data = await readData();
+                if (!data) return;
+
+                const targetCandy = data.find(candy => candy.name === candyName);
+
+                if (!targetCandy) {
+                    alert(`오류: "${candyName}" 이름의 젤리를 찾을 수 없습니다.`);
+                    return;
+                }
+
+                const targetId = targetCandy.id;
+
+                if (!confirm(`정말로 젤리 "${candyName}" (ID: ${targetId})을 삭제하시겠습니까?`)) {
+                    return;
+                }
+
+                const deleteUrl = `${API_URL}/${targetId}`;
+                await handleFetch(deleteUrl, { method: "DELETE" });
+
+                alert(`젤리 "${candyName}" 데이터 삭제 완료.`);
+                await readData();
+            } catch (error) {
+                alert("데이터 삭제에 실패했습니다. 콘솔을 확인하세요.");
+            }
+        };
+
+        // --- 이벤트 리스너 등록 ---
+        document.getElementById("btnRead").addEventListener("click", readData);
+        document.getElementById("btnCreate").addEventListener("click", createData);
+        document.getElementById("btnUpdate").addEventListener("click", updateData);
+        document.getElementById("btnDelete").addEventListener("click", deleteData);
+    </script>
+</body>
+
+</html>
