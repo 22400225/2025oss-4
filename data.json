@@ -71,18 +71,25 @@
       "quantity": 2
     },
     {
-      "name": "Deayeon's Jelly spicy",
-      "price": 1.12,
-      "country": "716gh",
+      "name": "Daeyeon's Jelly",
+      "price": 4.23,
+      "country": "Korea",
       "quantity": 1,
       "id": "5552"
     },
     {
-      "id": "feef",
-      "name": "Teawoo's Milk Pudding",
-      "price": 23,
-      "country": "716호",
+      "id": "315b",
+      "name": "이대연 젤리",
+      "price": 1,
+      "country": "한국",
       "quantity": 1
+    },
+    {
+      "id": "325",
+      "name": "Teawoo Jelly",
+      "price": 12,
+      "country": "Korea",
+      "quantity": 12
     }
   ]
 }

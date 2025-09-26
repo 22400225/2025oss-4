@@ -46,7 +46,7 @@
     });
 
     document.getElementById('stopButton').addEventListener('click', function () {
-        
+        count = 0;
         clearInterval(timer);
         document.getElementById('timer').innerText = count;
         timer = null;

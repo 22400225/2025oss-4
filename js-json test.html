@@ -7,14 +7,22 @@
 </head>
 <body>
     <h2>JS-JSON Test</h2>
-    <button id="btn1" onclick="toJson()">JSON.stringify()</button>
+    <button id="btn1">JSON.stringify()</button>
     <p id="demo">user</p>
-    <button id="btn2" onclick="parseJson()">JSON.parse()</button>
-    <p id="user">yeah</p>
+    <button id="btn2">JSON.parse()</button>
+    <h3 id="user">yeah</h3>
 </body>
 </html>
 
 <script>
-    const user = {name: "JOhn", age: 30, }
+    const user = { name: "John", age: 30, city: "New York" };
+    document.getElementById("btn1").addEventListener("click", function() {
+        document.getElementById("demo").innerText = JSON.stringify(user);
+    });
+    document.getElementById("btn2").addEventListener("click", function() {
+        const jsonString = document.getElementById("demo").innerText;
+        const parsed= JSON.parse(jsonString);
+        document.getElementById("user").innerText = parsed.name + " " + parsed.age + " " + parsed.city;
+    });
 </script>
 
