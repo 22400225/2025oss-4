@@ -57,11 +57,11 @@
       "quantity": 5
     },
     {
-      "id": "10",
-      "name": "Lab Gummy",
-      "price": 4,
-      "country": "USA",
-      "quantity": 5
+      "name": "Teawoo's Cookie",
+      "price": 3.23,
+      "country": "716호",
+      "quantity": 1,
+      "id": "10"
     },
     {
       "id": "863c",
@@ -71,11 +71,11 @@
       "quantity": 2
     },
     {
-      "id": "5552",
-      "name": "deayeon gummy",
-      "price": 2.54,
-      "country": "Thai Land",
-      "quantity": 12
+      "name": "Deayeon's Jelly spicy",
+      "price": 1.12,
+      "country": "716gh",
+      "quantity": 1,
+      "id": "5552"
     }
   ]
 }
