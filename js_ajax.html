@@ -200,7 +200,7 @@
 
         <div id="inputForm">
             <div class="input-group">
-                <label for="inputName">이름  *</label>
+                <label for="inputName">이름 *</label>
                 <input type="text" id="inputName" placeholder="예: 하리보 골드베렌" required>
             </div>
             <div class="input-group">
@@ -232,7 +232,7 @@
 
 
     <script>
-        const API_URL = "http://localhost:3001/jelly";
+        const API_URL = "http://172.17.172.233:3001/jelly";
 
         const getInputValues = () => ({
             name: document.getElementById('inputName').value.trim(),
@@ -271,7 +271,7 @@
                 if (!response.ok) {
                     let errorText = await response.text();
                     try {
-                        
+
                         const errorJson = JSON.parse(errorText);
                         errorText = errorJson.id || errorText;
                     } catch (e) {
@@ -301,7 +301,7 @@
         // Create (추가) - POST
         const createData = async () => {
             const { name, price, country, quantity, targetId } = getInputValues();
-            
+
             // 필수 입력값 및 ID 확인
             if (!name || isNaN(price) || price < 0 || isNaN(quantity) || quantity < 0) {
                 alert("이름, 가격, 수량을 올바르게 입력해주세요.");
@@ -365,7 +365,7 @@
         const deleteData = async () => {
             const currentData = await readData();
             if (!currentData) return;
-            
+
             const candyName = prompt("삭제할 젤리의 정확한 이름을 입력하세요.");
             if (!candyName) return;
 
